@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        vertical-align: baseline;
+      }
+
+      #wrapper {
+        width: 100vw;
+        height: 100vh;
+        overflow: auto;
+        display: flex;
+        background-color: #77b1a9;
+      }
+
+      #quote-box {
+        width: 40%;
+        padding: 30px;
+        margin: auto;
+        background-color: #fff;
+      }
+
+      #text {
+        text-align: center;
+        margin: 30px;
+        font-size: 30px;
+        color: #77b1a9;
+      }
+
+      #author {
+        text-align: right;
+        margin: 30px;
+        color: #77b1a9;
+      }
+
+      button {
+        height: 38px;
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        background-color: #77b1a9;
+        outline: none;
+        font-size: 0.85em;
+        padding: 8px 18px 6px 18px;
+        margin-top: 30px;
+        opacity: 1;
+        cursor: pointer;
+      }
+
+      #new-quote {
+        float: right;
+      }
+
+      #tweet-quote {
+        float: left;
+        margin-right: 10px;
+      }
+    </style>
+    <title>Build a Random Quote Machine</title>
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="quote-box">
+        <div id="text">
+          <i class="fa fa-quote-left"></i>
+          <span id="quote-text"
+            >What's money? A man is a success if he gets up in the morning and
+            goes to bed at night and in between does what he wants to do.</span
+          >
+        </div>
+        <div id="author">- Ayn Rand</div>
+        <button id="new-quote" onclick="handleClick()">New quote</button>
+        <a id="tweet-quote" target="_blank"
+          ><button id="t-quote"><i class="fa fa-twitter"></i></button
+        ></a>
+        <script>
+          var colors = [
+            'rgb(255, 0, 0)',
+            'rgb(255, 100, 100)',
+            'rgb(0, 255, 0)',
+            'rgb(100, 255, 100)',
+            'rgb(0, 0, 255)',
+            'rgb(100, 100, 255)',
+            'rgb(22, 160, 133)',
+            'rgb(39, 174, 96)',
+            'rgb(44, 62, 80)',
+            'rgb(243, 156, 18)',
+            'rgb(231, 76, 60)',
+            'rgb(155, 89, 182)',
+            'rgb(251, 105, 100)',
+            'rgb(52, 34, 36)',
+            'rgb(71, 46, 50)',
+            'rgb(189, 187, 153)',
+            'rgb(119, 177, 169)',
+            'rgb(115, 168, 87)'
+          ]
+
+          var el = document.getElementById('wrapper') // your element
+          var el2 = document.getElementById('text')
+          var el3 = document.getElementById('author')
+          var el4 = document.getElementById('new-quote')
+          var el5 = document.getElementById('t-quote')
+          var property = 'background-color' // fading property
+
+          function getStyle(obj, name) {
+            // obj = document.getElementById('id')
+            if (obj.currentStyle) {
+              // for ie get in-line and non-inline style
+              return obj.currentStyle[name]
+            } else {
+              // for non ie get in-line and non-inline style
+              return getComputedStyle(obj, false)[name] //false just for position
+            }
+          }
+
+          function ColorObj(colorStr) {
+            // change rgb(255,0,255) to obj{r,g,b}
+            return {
+              r: colorStr.match(/\d+/g)[0],
+              g: colorStr.match(/\d+/g)[1],
+              b: colorStr.match(/\d+/g)[2]
+            }
+          }
+
+          lerp = function(a, b, u) {
+            return (1 - u) * a + u * b
+          }
+
+          fade = function(element, property, start, end, duration) {
+            var interval = 10
+            var steps = duration / interval
+            var step_u = 1.0 / steps
+            var u = 0.0
+
+            var theInterval = setInterval(function() {
+              if (u >= 1.0) {
+                clearInterval(theInterval)
+              }
+              var r = parseInt(lerp(start.r, end.r, u))
+              var g = parseInt(lerp(start.g, end.g, u))
+              var b = parseInt(lerp(start.b, end.b, u))
+              var colorname = 'rgb(' + r + ',' + g + ',' + b + ')'
+              element.style.setProperty(property, colorname)
+              u += step_u
+            }, interval)
+          }
+
+          function changeColor() {
+            var startColor = ColorObj(getStyle(el, 'background-color'))
+            // use getStyle() to get current in-line or non-in-line background-color
+
+            var colorIndex = Math.floor(Math.random() * colors.length)
+            var endColor = ColorObj(colors[colorIndex]) // random endColor
+
+            // color animation
+            fade(el, 'background-color', startColor, endColor, 1000)
+            fade(el2, 'color', startColor, endColor, 1000)
+            fade(el3, 'color', startColor, endColor, 1000)
+            fade(el4, 'background-color', startColor, endColor, 1000)
+            fade(el5, 'background-color', startColor, endColor, 1000)
+          }
+
+          function changeHref() {
+            document.getElementById('tweet-quote').href =
+              'https://twitter.com/intent/tweet?text=' +
+              encodeURIComponent(
+                '"' +
+                  document.getElementById('quote-text').innerHTML +
+                  '" ' +
+                  document.getElementById('author').innerHTML +
+                  ' #quotes'
+              )
+          }
+          window.onload = function() {
+            changeHref()
+          }
+          var handleClick = function() {
+            var url =
+              'https://gist.githubusercontent.com/camperbot/5a022b72e96c4c9585c32bf6a75f62d9/raw/e3c6895ce42069f0ee7e991229064f167fe8ccdc/quotes.json'
+
+            fetch(url)
+              .then(response => response.json())
+              .then(response => {
+                var randomIndex = Math.floor(
+                  Math.random() * response.quotes.length
+                )
+                document.getElementById(
+                  'quote-text'
+                ).innerHTML = response.quotes[randomIndex].quote.replace(
+                  '’',
+                  "'"
+                )
+                document.getElementById('author').innerHTML =
+                  '- ' + response.quotes[randomIndex].author
+                var color = Math.floor(Math.random() * colors.length)
+              })
+              .then(() => {
+                changeHref()
+                changeColor()
+              })
+          }
+        </script>
+      </div>
+    </div>
+  </body>
+</html>
